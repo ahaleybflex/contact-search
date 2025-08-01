@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Branch Contact Search Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8fafc;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 32px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .header h1 {
+            color: #1f2937;
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            color: #6b7280;
+            font-size: 1.1rem;
+        }
+        
+        .search-section {
+            margin-bottom: 32px;
+        }
+        
+        .search-box {
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .select-box {
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            background: white;
+        }
+        
+        .select-box:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        
+        .results {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            display: none;
+        }
+        
+        .results.show {
+            display: block;
+        }
+        
+        .results h2 {
+            color: #1f2937;
+            margin-bottom: 24px;
+            font-size: 1.5rem;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .info-card h3 {
+            color: #374151;
+            margin-bottom: 12px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-card .icon {
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+        
+        .location-icon { color: #3b82f6; }
+        .phone-icon { color: #10b981; }
+        .user-icon { color: #8b5cf6; }
+        
+        .info-card .main-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+        
+        .info-card .sub-text {
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+        
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        
+        .contact-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid;
+        }
+        
+        .sales-engineer {
+            border-left-color: #3b82f6;
+        }
+        
+        .account-coordinator {
+            border-left-color: #10b981;
+        }
+        
+        .no-selection {
+            text-align: center;
+            padding: 48px 24px;
+            background: #f9fafb;
+            border-radius: 12px;
+            color: #6b7280;
+        }
+        
+        .no-selection .icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 32px;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 24px;
+            border-radius: 8px;
+            color: white;
+        }
+        
+        .stat-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .stat-green { background: linear-gradient(135deg, #10b981, #047857); }
+        .stat-purple { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Branch Contact Search</h1>
+            <p>Find your sales engineer and account coordinator by branch</p>
+        </div>
+        
+        <div class="search-section">
+            <input type="text" id="searchInput" class="search-box" placeholder="Search by branch name or number...">
+            
+            <select id="branchSelect" class="select-box">
+                <option value="">Please Select Branch</option>
+            </select>
+        </div>
+        
+        <div id="results" class="results">
+            <h2>Branch Information</h2>
+            
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3><span class="icon location-icon">📍</span>Location</h3>
+                    <div class="main-text" id="branchName"></div>
+                    <div class="sub-text" id="branchAddress"></div>
+                    <div class="sub-text" id="branchCity"></div>
+                </div>
+                
+                <div class="info-card">
+                    <h3><span class="icon phone-icon">📞</span>Contact</h3>
+                    <div class="main-text" id="branchNumber"></div>
+                    <div class="sub-text" id="branchPhone"></div>
+                </div>
+            </div>
+            
+            <div class="contact-grid">
+                <div class="contact-card sales-engineer">
+                    <h3><span class="icon user-icon">👨‍💼</span>Sales Engineer</h3>
+                    <div class="main-text" id="salesEngineer"></div>
+                </div>
+                
+                <div class="contact-card account-coordinator">
+                    <h3><span class="icon user-icon">👩‍💼</span>Account Coordinator</h3>
+                    <div class="main-text" id="accountCoordinator"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="noSelection" class="no-selection">
+            <div class="icon">🔍</div>
+            <h3>Select a branch to view contact information</h3>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card stat-blue">
+                <div class="stat-number" id="totalBranches">75</div>
+                <div class="stat-label">Total Branches</div>
+            </div>
+            <div class="stat-card stat-green">
+                <div class="stat-number" id="totalSalesEngineers">5</div>
+                <div class="stat-label">Sales Engineers</div>
+            </div>
+            <div class="stat-card stat-purple">
+                <div class="stat-number" id="totalCoordinators">4</div>
+                <div class="stat-label">Account Coordinators</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Branch data
+        const branchData = [
+            { branchNum: 1063, branch: "Amarillo", address: "3000 W Amarillo Blvd", city: "Amarillo, TX 79106", phone: "806-372-8000", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1041, branch: "Ardmore", address: "2427 W Broadway St", city: "Ardmore, OK  73401", phone: "580-226-0400", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1011, branch: "Bridgeport", address: "510 Hwy 380", city: "Bridgeport, TX 76426", phone: "940-683-6700", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1077, branch: "Caldwell", address: "1620 Industrial Way", city: "Caldwell, ID 83605", phone: "208-454-9305", salesEngineer: "HOUSE ", accountCoordinator: "Kelly Iannaccone" },
+            { branchNum: 1003, branch: "Corsicana", address: "1319 S Seventh St", city: "Corsicana, TX 75110", phone: "903-874-4721", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1005, branch: "Dallas Corporate", address: "10500 N Stemmons Fwy", city: "Dallas, TX 75220", phone: "214-358-5500", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1050, branch: "Dallas North", address: "10500 N Stemmons Fwy", city: "Dallas, TX 75220", phone: "214-358-5588", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1070, branch: "Dallas South", address: "4935 Sharp St", city: "Dallas, TX 75247", phone: "214-630-7681", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1012, branch: "Denton", address: "900 E Hickory St", city: "Denton, TX 76205", phone: "940-380-9600", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1007, branch: "Ft Worth", address: "5050 N Fwy", city: "Ft Worth, TX 76137", phone: "817-831-4581", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1069, branch: "Garland", address: "3548 Miller Park Dr", city: "Garland, TX 75042", phone: "972-494-2536", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1014, branch: "Greenville", address: "4300 Joe Ramsey Blvd", city: "Greenville, TX 75401", phone: "903-454-3400", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1074, branch: "Idaho Falls", address: "4700 W 65th S", city: "Idaho Falls, ID 83402", phone: "208-528-9393", salesEngineer: "HOUSE ", accountCoordinator: "Kelly Iannaccone" },
+            { branchNum: 1073, branch: "Lubbock", address: "3001 I-27 Frontage Rd", city: "Lubbock, TX 79404", phone: "806-763-5166", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1015, branch: "McKinney", address: "323 Industrial Blvd Ste A", city: "McKinney, TX 75069", phone: "972-542-1000", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1026, branch: "Mineral Wells", address: "616 SE 6th Ave", city: "Mineral Wells, TX 76067", phone: "940-327-0200", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1043, branch: "Mt Pleasant", address: "700 E 16th St", city: "Mt Pleasant, TX 75455", phone: "903-575-1900", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1039, branch: "Oklahoma City", address: "4200 Highline Blvd", city: "Oklahoma City, OK  73108", phone: "405-917-5050", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1018, branch: "Paris", address: "1145 NW Loop 286", city: "Paris, TX 75460", phone: "903-784-1791", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1075, branch: "Pocatello", address: "3700 Hwy 30 W", city: "Pocatello, ID 83201", phone: "208-235-9771", salesEngineer: "HOUSE ", accountCoordinator: "Kelly Iannaccone" },
+            { branchNum: 1023, branch: "Stephenville", address: "1225 N Graham", city: "Stephenville, TX 76401", phone: "254-968-6700", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1002, branch: "Temple", address: "209 N 43rd St", city: "Temple, TX 76504", phone: "254-778-6797", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1019, branch: "Tyler", address: "2565 W NW Loop 323", city: "Tyler, TX 75702", phone: "903-593-6600", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1001, branch: "Waco", address: "2413 Franklin Ave", city: "Waco, TX 76701", phone: "254-753-6477", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1029, branch: "Waxahachie", address: "1520 W Hwy 287 Bypass", city: "Waxahachie, TX 75165", phone: "972-937-7722", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1076, branch: "Wendell", address: "270 W Ave H", city: "Wendell, ID 83355", phone: "208-536-9924", salesEngineer: "HOUSE ", accountCoordinator: "Kelly Iannaccone" },
+            { branchNum: 1024, branch: "Wichita Falls", address: "5828 Ashleyanne Cir, Ste 100", city: "Wichita Falls, TX 76310", phone: "940-763-0505", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1006, branch: "Austin", address: "1615 Rutherford Ln", city: "Austin, TX 78754", phone: "512-837-7696", salesEngineer: "Bruce & Karen Howard", accountCoordinator: "Sierra Lomasang" },
+            { branchNum: 1010, branch: "Corpus Christi", address: "725 Navigation Blvd", city: "Corpus Christi, TX 78408", phone: "361-881-9600", salesEngineer: "Bruce & Karen Howard", accountCoordinator: "Sierra Lomasang" },
+            { branchNum: 1009, branch: "El Paso", address: "805 Tony Lama St", city: "El Paso, TX 79915", phone: "915-775-1400", salesEngineer: "Bruce & Karen Howard", accountCoordinator: "Sierra Lomasang" },
+            { branchNum: 1032, branch: "Las Cruces", address: "310 Southgate Ct Ste 1", city: "Las Cruces, NM 88005", phone: "575-526-3000", salesEngineer: "Bruce & Karen Howard", accountCoordinator: "Sierra Lomasang" },
+            { branchNum: 1072, branch: "Odessa", address: "12415 W I-20 E Frontage Rd", city: "Odessa, TX  79765", phone: "432-332-0464", salesEngineer: "Bruce & Karen Howard", accountCoordinator: "Sierra Lomasang" },
+            { branchNum: 1008, branch: "Pharr", address: "1100 W Interstate 2", city: "Pharr, TX 78577", phone: "956-787-1700", salesEngineer: "Bruce & Karen Howard", accountCoordinator: "Sierra Lomasang" },
+            { branchNum: 1036, branch: "San Angelo", address: "1221 Pulliam St", city: "San Angelo, TX  76903", phone: "325-653-6886", salesEngineer: "Bruce & Karen Howard", accountCoordinator: "Sierra Lomasang" },
+            { branchNum: 1004, branch: "San Antonio", address: "611 N WW White Rd", city: "San Antonio, TX 78219", phone: "210-299-1010", salesEngineer: "Bruce & Karen Howard", accountCoordinator: "Sierra Lomasang" },
+            { branchNum: 1052, branch: "Baton Rouge", address: "13224 S Choctaw Dr", city: "Baton Rouge, LA 70815", phone: "225-272-3000", salesEngineer: "Vacant", accountCoordinator: "Alina Scallo" },
+            { branchNum: 1028, branch: "Beaumont", address: "4120 Washington Blvd", city: "Beaumont, TX 77705", phone: "409-842-5588", salesEngineer: "Bruce & Karen Howard", accountCoordinator: "Sierra Lomasang" },
+            { branchNum: 1022, branch: "Bryan", address: "1418 S Texas Ave", city: "Bryan, TX 77802", phone: "979-821-2277", salesEngineer: "Bruce & Karen Howard", accountCoordinator: "Sierra Lomasang" },
+            { branchNum: 1013, branch: "Eagle Lake", address: "323 S McCarty Ave", city: "Eagle Lake, TX 77434", phone: "979-234-7474", salesEngineer: "Bruce & Karen Howard", accountCoordinator: "Sierra Lomasang" },
+            { branchNum: 1017, branch: "Houston NW", address: "10357 W Sam Houston Pkwy N", city: "Houston, TX 77064", phone: "713-856-5600", salesEngineer: "Bruce & Karen Howard", accountCoordinator: "Sierra Lomasang" },
+            { branchNum: 1016, branch: "Houston SE", address: "9400 Lawndale Ave", city: "Houston, TX 77012", phone: "713-921-3200", salesEngineer: "Bruce & Karen Howard", accountCoordinator: "Sierra Lomasang" },
+            { branchNum: 1066, branch: "Lafayette", address: "420 Beau Pre Rd", city: "Lafayette, LA 70508", phone: "337-261-0101", salesEngineer: "Vacant", accountCoordinator: "Alina Scallo" },
+            { branchNum: 1020, branch: "Nacogdoches", address: "7804 NW Loop 224", city: "Nacogdoches, TX 75961", phone: "936-564-4810", salesEngineer: "Bruce & Karen Howard", accountCoordinator: "Sierra Lomasang" },
+            { branchNum: 1054, branch: "Hannibal", address: "2033 Industrial Valley Park Rd", city: "Hannibal, MO  63401", phone: "573-406-0100", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1057, branch: "Jackson", address: "420 E Adams St", city: "Jackson, MO  63755", phone: "573-204-0542", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1059, branch: "Newbern", address: "106 E Hwy 77", city: "Newbern, TN  38059", phone: "731-627-0001", salesEngineer: "Vacant", accountCoordinator: "Sierra Lomasang" },
+            { branchNum: 1061, branch: "Pittsburg", address: "700 E Jefferson St", city: "Pittsburg, KS  66762", phone: "620-232-2911", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1053, branch: "Shreveport", address: "300 Lynbrook Blvd", city: "Shreveport, LA 71106", phone: "318-683-4949", salesEngineer: "Vacant", accountCoordinator: "Sierra Lomasang" },
+            { branchNum: 1058, branch: "Sikeston", address: "134 Airport Industrial Dr", city: "Sikeston, MO  63801", phone: "573-472-0693", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1, branch: "Springfield", address: "1837 E Pacific St", city: "Springfield, MO  65803", phone: "417-869-5629", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1055, branch: "St Louis", address: "1212 Dielman Industrial Ct", city: "Olivette, MO 63132", phone: "314-865-5211", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1056, branch: "Ste Genevieve", address: "10035 State Route O", city: "Ste Genevieve, MO  63670", phone: "573-483-9299", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1037, branch: "Batesville", address: "2150 Harrison St", city: "Batesville, AR  72501", phone: "870-793-6900", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1042, branch: "Blytheville", address: "4375 E Hwy 18", city: "Blytheville, AR 72315", phone: "870-763-7500", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1038, branch: "Ft Smith", address: "5917 S 26th Cir", city: "Ft Smith, AR  72901", phone: "479-646-7600", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1030, branch: "Jonesboro", address: "5911 Dalton Farmer Dr", city: "Jonesboro, AR 72404", phone: "870-933-9933", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1025, branch: "Little Rock", address: "8911 I-30 N", city: "Little Rock, AR  72209", phone: "501-945-9425", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1027, branch: "Stuttgart", address: "502 E 2nd St", city: "Stuttgart, AR 72160", phone: "870-673-6161", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1021, branch: "Texarkana", address: "3101 W 7th St", city: "Texarkana, TX 75501", phone: "903-794-3333", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1040, branch: "Tulsa", address: "4118 S 70th E Ave", city: "Tulsa, OK  74145", phone: "918-622-3344", salesEngineer: "Daryl Bolton", accountCoordinator: "Adalis Dejesus" },
+            { branchNum: 1064, branch: "Elko", address: "582 W Cedar St", city: "Elko, NV 89801", phone: "775-738-1200", salesEngineer: "Bruce & Karen Howard", accountCoordinator: "Sierra Lomasang" },
+            { branchNum: 1033, branch: "Kingman", address: "3525 Essco St", city: "Kingman, AZ 86409", phone: "928-757-3138", salesEngineer: "Bruce & Karen Howard", accountCoordinator: "Sierra Lomasang" },
+            { branchNum: 1035, branch: "Las Vegas", address: "3360 W Sunset Rd", city: "Las Vegas, NV 89118", phone: "702-876-4225", salesEngineer: "Bruce & Karen Howard", accountCoordinator: "Sierra Lomasang" },
+            { branchNum: 1045, branch: "Phoenix", address: "320 N 51st Ave", city: "Phoenix, AZ 85043", phone: "602-233-9200", salesEngineer: "Bruce & Karen Howard", accountCoordinator: "Sierra Lomasang" },
+            { branchNum: 1034, branch: "St George", address: "389 N Industrial Rd #6", city: "St George, UT 84770", phone: "435-674-1277", salesEngineer: "Patrick Dietrich", accountCoordinator: "Kelly Iannaccone" },
+            { branchNum: 1068, branch: "Billings", address: "1411 4th Ave N", city: "Billings, MT 59101", phone: "406-237-1977", salesEngineer: "HOUSE ", accountCoordinator: "Kelly Iannaccone" },
+            { branchNum: 1067, branch: "Casper", address: "1800 Opportunity Blvd", city: "Casper, WY 82601", phone: "307-472-0811", salesEngineer: "HOUSE ", accountCoordinator: "Kelly Iannaccone" },
+            { branchNum: 1048, branch: "Colorado Springs", address: "4630 Forge Rd, Unit A", city: "Colorado Springs, CO 80907", phone: "719-268-6000", salesEngineer: "Patrick Dietrich", accountCoordinator: "Kelly Iannaccone" },
+            { branchNum: 1049, branch: "Denver", address: "13100 E Albrook Dr, Ste 100", city: "Denver, CO 80239", phone: "303-200-1212", salesEngineer: "Patrick Dietrich", accountCoordinator: "Kelly Iannaccone" },
+            { branchNum: 1062, branch: "Farmington", address: "3300 Bloomfield Hwy", city: "Farmington, NM 87401", phone: "505-326-7330", salesEngineer: "Bruce & Karen Howard", accountCoordinator: "Sierra Lomasang" },
+            { branchNum: 1071, branch: "Gillette", address: "604 E Lakeway Rd", city: "Gillette, WY 82718", phone: "307-682-1655", salesEngineer: "HOUSE ", accountCoordinator: "Kelly Iannaccone" },
+            { branchNum: 1047, branch: "Grand Junction", address: "2308 Interstate Ave", city: "Grand Junction, CO 81505", phone: "970-208-0009", salesEngineer: "Patrick Dietrich", accountCoordinator: "Kelly Iannaccone" },
+            { branchNum: 1046, branch: "Greeley", address: "2234 117th Ave Suite 110", city: "Greeley, CO 80634", phone: "970-804-2500", salesEngineer: "Patrick Dietrich", accountCoordinator: "Kelly Iannaccone" },
+            { branchNum: 1302, branch: "IMSCO Albuquerque", address: "3815 Singer Blvd NE", city: "Albuquerque, NM  87109", phone: "505-884-4800", salesEngineer: "Bruce & Karen Howard", accountCoordinator: "Sierra Lomasang" },
+            { branchNum: 1301, branch: "Mine Supply Carlsbad", address: "402 S Main St", city: "Carlsbad, NM  88220", phone: "575-887-2888", salesEngineer: "Bruce & Karen Howard", accountCoordinator: "Sierra Lomasang" }
+        ];
+
+        let filteredBranches = [...branchData];
+
+        // Initialize the page
+        function init() {
+            populateDropdown(branchData);
+            setupEventListeners();
+            updateStats();
+        }
+
+        // Populate dropdown with branch options
+        function populateDropdown(branches) {
+            const select = document.getElementById('branchSelect');
+            // Clear existing options except the first one
+            select.innerHTML = '<option value="">Please Select Branch</option>';
+            
+            branches.forEach(branch => {
+                const option = document.createElement('option');
+                option.value = branch.branchNum;
+                option.textContent = `${branch.branchNum} - ${branch.branch}`;
+                select.appendChild(option);
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            const searchInput = document.getElementById('searchInput');
+            const branchSelect = document.getElementById('branchSelect');
+
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                filteredBranches = branchData.filter(branch => 
+                    branch.branch.toLowerCase().includes(searchTerm) ||
+                    branch.branchNum.toString().includes(searchTerm)
+                );
+                populateDropdown(filteredBranches);
+                // Clear selection if current selection is not in filtered results
+                const currentSelection = branchSelect.value;
+                if (currentSelection && !filteredBranches.find(b => b.branchNum.toString() === currentSelection)) {
+                    branchSelect.value = '';
+                    hideResults();
+                }
+            });
+
+            branchSelect.addEventListener('change', function() {
+                const selectedBranchNum = this.value;
+                if (selectedBranchNum) {
+                    const selectedBranch = branchData.find(branch => 
+                        branch.branchNum.toString() === selectedBranchNum
+                    );
+                    if (selectedBranch) {
+                        showResults(selectedBranch);
+                    }
+                } else {
+                    hideResults();
+                }
+            });
+        }
+
+        // Show results for selected branch
+        function showResults(branch) {
+            document.getElementById('branchName').textContent = branch.branch;
+            document.getElementById('branchAddress').textContent = branch.address;
+            document.getElementById('branchCity').textContent = branch.city;
+            document.getElementById('branchNumber').textContent = `Branch #${branch.branchNum}`;
+            document.getElementById('branchPhone').textContent = branch.phone;
+            document.getElementById('salesEngineer').textContent = branch.salesEngineer || 'N/A';
+            document.getElementById('accountCoordinator').textContent = branch.accountCoordinator || 'N/A';
+            
+            document.getElementById('results').classList.add('show');
+            document.getElementById('noSelection').style.display = 'none';
+        }
+
+        // Hide results
+        function hideResults() {
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('noSelection').style.display = 'block';
+        }
+
+        // Update statistics
+        function updateStats() {
+            const uniqueSalesEngineers = new Set(branchData.map(b => b.salesEngineer)).size;
+            const uniqueCoordinators = new Set(branchData.map(b => b.accountCoordinator)).size;
+            
+            document.getElementById('totalBranches').textContent = branchData.length;
+            document.getElementById('totalSalesEngineers').textContent = uniqueSalesEngineers;
+            document.getElementById('totalCoordinators').textContent = uniqueCoordinators;
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
